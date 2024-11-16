@@ -13,17 +13,18 @@ on:
 jobs:
   Continuous-Integration:
     runs-on: ubuntu-latest
-
     env:
-      DB_URL: ${{ secrets.DB_URL }}
-      DB_USERNAME: ${{ secrets.DB_USERNAME }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      #데이터베이스 환경변수(추후 RDS로 전환할 예정)
+      RDS_URL: ${{ secrets.DB_URL }}
+      RDS_USERNAME: ${{ secrets.DB_USERNAME }}
+      RDS_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      
 
     steps:
       - name: Github Repository 파일 불러오기
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # 모든 커밋히스토리를 불러옴
 
       - name: JDK 21 버전 설치
         uses: actions/setup-java@v4
@@ -45,30 +46,5 @@ jobs:
         run: chmod +x ./gradlew
         shell: bash
 
-    
       - name: 빌드 및 테스트
         run: ./gradlew build
-
-
-      - name: Close PR, if build fail
-        if: ${{ failure() }}
-        uses: actions/github-script@v6
-        with: # actions(uses)의 파라미터 역할
-          github-token: ${{ github.TOKEN }}
-          script: | 
-            const pull_number = ${{ github.event.pull_request.number }}
-            const updated_title = `[BUILD FAIL] ${{ github.event.pull_request.title }}`
-            await github.rest.pulls.createReview({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: pull_number,
-              body: '빌드에 실패했습니다.',
-              event: 'REQUEST_CHANGES'
-            })
-            await github.rest.pulls.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: pull_number,
-              title: updated_title,
-              state: 'closed'
-            })
