@@ -12,10 +12,10 @@ import java.util.UUID;
 public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+
 
     @Column(name = "center_id", nullable = false, length = 16)
-    private String centerId;
+    private Strin centerId;
 
     @Lob
     @Column(name = "content", nullable = false)
