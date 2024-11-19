@@ -50,14 +50,16 @@ jobs:
         run: ./gradlew build
 
 
-      - name: Close PR, if build fail
+      # DESCRIBE: 빌드 실패한 경우에만 실행되는 step
+      - name: If build fail
+        # 이전 step이 실패한 경우에만 이 step을 실행시키는 syntax
         if: ${{ failure() }}
         uses: actions/github-script@v6
-        with: # actions(uses)의 파라미터 역할
-          github-token: ${{ github.TOKEN }}
-          script: | 
+        with:
+          github-token: ${{ github.token }}
+          script: |
             const pull_number = ${{ github.event.pull_request.number }}
-            const updated_title = `[BUILD FAIL] ${{ github.event.pull_request.title }}`
+            const updated_title = [BUILD FAIL] ${{ github.event.pull_request.title }}
             await github.rest.pulls.createReview({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -72,3 +74,17 @@ jobs:
               title: updated_title,
               state: 'closed'
             })
+
+#      - name: Docker build
+#        run: |
+#            docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_PASSWORD }}
+#            docker build -t somemore .
+#            docker tag somemore 7zrv/somemore:${GITHUB_SHA::7}
+#            docker push 7zrv/somemore:${GITHUB_SHA::7}
+
+      - name: Docker build and push
+        run: |
+          echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+          docker build -t 7zrv/somemore:${GITHUB_SHA::7} -t 7zrv/somemore:latest .
+          docker push 7zrv/somemore:${GITHUB_SHA::7}
+          docker push 7zrv/somemore:latest
