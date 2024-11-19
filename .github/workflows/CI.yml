@@ -74,3 +74,10 @@ jobs:
               title: updated_title,
               state: 'closed'
             })
+
+      - name: Docker build
+        run: |
+            docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_PASSWORD }}
+            docker build -t somemore . 
+            docker tag somemore 7zrv/somemore:${GITHUB_SHA::7}
+            docker push 7zrv/somemore:${GITHUB_SHA::7}
