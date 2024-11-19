@@ -85,6 +85,6 @@ jobs:
       - name: Docker build and push
         run: |
           echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
-          docker build -t 7zrv/somemore:${{ github.sha::7 }} -t 7zrv/somemore:latest .
-          docker push 7zrv/somemore:${{ github.sha::7 }}
+          docker build -t 7zrv/somemore:${GITHUB_SHA::7} -t 7zrv/somemore:latest .
+          docker push 7zrv/somemore:${GITHUB_SHA::7}
           docker push 7zrv/somemore:latest
