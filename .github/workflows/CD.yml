@@ -70,7 +70,7 @@ jobs:
 
     steps:
       - name: SSH 연결을 통한 EC2 배포
-        uses: appleboy/ssh-action@v0.1.3
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
